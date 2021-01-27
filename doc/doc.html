@@ -3,15 +3,28 @@
 <textarea style='display: none;' id='headerFile'>
 #ifndef __CZ80LIB_H__
 #define __CZ80LIB_H__
-//Structs
-typedef struct {
+typedef struct { //!show struct
 	int T0, T1, ST0, ST1, INT_ENABLED, INT_MODE, TABLE, STATUS;
 	int REGS[14];
 	unsigned char RAM[65536];
-	void (*PortOutCallback)(unsigned char, unsigned char);
-	unsigned char (*PortInCallback)(unsigned char);
-	unsigned short (*InterruptCallback)(unsigned char mode);
-} CZ80LIB_Machine;
+	////!show struct This callback is executed whenever
+	////!show struct the interpreter encounters an OUT
+	////!show struct instruction.
+	void (*PortOutCallback)(unsigned char, unsigned char); //!show struct
+	////!show struct This callback is executed whenever
+	////!show struct the interpreter encounters an IN
+	////!show struct instruction.
+	unsigned char (*PortInCallback)(unsigned char); //!show struct
+	////!show struct This callback is executed
+	////!show struct repeatedly when interrupts are
+	////!show struct enabled. The lower byte is 1 or 0
+	////!show struct indicating whether or not the
+	////!show struct interrupt should be fired. The
+	////!show struct upper byte is used for Mode 2
+	////!show struct interrupts as the value combined
+	////!show struct combined with the I register.
+	unsigned short (*InterruptCallback)(unsigned char); //!show struct
+} CZ80LIB_Machine; //!show struct
 //Instruction info
 typedef struct {
 	unsigned char OpCode, Table;
@@ -157,6 +170,7 @@ var $ = function(q) {return document.querySelector(q);}
 var headerFile = $("#headerFile").value.split("\n");
 var entriesToDisplay = new Array(0);
 var constantsToDisplay = new Array(0);
+var structsToDisplay = new Array(0);
 for (var i = 0; i < headerFile.length; i++) {
 	if (headerFile[i].trim().substr(0, 7) == "extern ") {
 		var signature = headerFile[i].replace("extern ", "");
@@ -171,6 +185,10 @@ for (var i = 0; i < headerFile.length; i++) {
 	if (headerFile[i].trim().substr(0, f.length) == f) {
 		f = headerFile[i].split(" ");
 		constantsToDisplay.push({'name': f[1], 'value': f[2]});
+	}
+	f = "//!show struct";
+	if (headerFile[i].replace(f, "") != headerFile[i]) {
+		structsToDisplay.push(headerFile[i].replace(f, ""));
 	}
 }
 var div = document.createElement("div");
@@ -207,6 +225,29 @@ for (var i = -1; i < constantsToDisplay.length; i++) {
 }
 div.appendChild(tbl);
 document.body.appendChild(div);
+
+var h33 = document.createElement("h3");
+h33.style.color = "black";
+h33.innerHTML = "<b>Structs</b>";
+document.body.appendChild(h33);
+var txt = "";
+for (var i = 0; i < structsToDisplay.length; i++) {
+	if (structsToDisplay[i].trim().substr(0, 2) == "//") {
+		txt += "<b style='color: blue;'>" + structsToDisplay[i] + "</b>\n";
+	} else {
+		txt += "<b>" + structsToDisplay[i] + "</b>\n";
+	}
+}
+txt = addColor(txt, "void", "darkgreen");
+txt = addColor(txt, "unsigned", "darkgreen");
+txt = addColor(txt, "short", "darkgreen");
+txt = addColor(txt, "char", "darkgreen");
+txt = addColor(txt, "CZ80LIB_Machine", "darkgreen");
+txt = addColor(txt, "typedef", "darkgreen");
+txt = addColor(txt, "struct ", "darkgreen");
+var pre = document.createElement("pre");
+pre.innerHTML = txt;
+document.body.appendChild(pre);
 </script>
 </body>
 </html>

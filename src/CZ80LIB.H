@@ -1,14 +1,27 @@
 #ifndef __CZ80LIB_H__
 #define __CZ80LIB_H__
-//Structs
-typedef struct {
+typedef struct { //!show struct
 	int T0, T1, ST0, ST1, INT_ENABLED, INT_MODE, TABLE, STATUS;
 	int REGS[14];
 	unsigned char RAM[65536];
-	void (*PortOutCallback)(unsigned char, unsigned char);
-	unsigned char (*PortInCallback)(unsigned char);
-	unsigned short (*InterruptCallback)(unsigned char mode);
-} CZ80LIB_Machine;
+	////!show struct This callback is executed whenever
+	////!show struct the interpreter encounters an OUT
+	////!show struct instruction.
+	void (*PortOutCallback)(unsigned char, unsigned char); //!show struct
+	////!show struct This callback is executed whenever
+	////!show struct the interpreter encounters an IN
+	////!show struct instruction.
+	unsigned char (*PortInCallback)(unsigned char); //!show struct
+	////!show struct This callback is executed
+	////!show struct repeatedly when interrupts are
+	////!show struct enabled. The lower byte is 1 or 0
+	////!show struct indicating whether or not the
+	////!show struct interrupt should be fired. The
+	////!show struct upper byte is used for Mode 2
+	////!show struct interrupts as the value combined
+	////!show struct combined with the I register.
+	unsigned short (*InterruptCallback)(unsigned char); //!show struct
+} CZ80LIB_Machine; //!show struct
 //Instruction info
 typedef struct {
 	unsigned char OpCode, Table;
