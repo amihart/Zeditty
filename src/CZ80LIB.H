@@ -55,7 +55,7 @@ typedef struct {
 static void CZ80LIB_DefaultPortOutCallback(unsigned char port, unsigned char value);
 static unsigned char CZ80LIB_DefaultPortInCallback(unsigned char port);
 static unsigned short CZ80LIB_DefaultInterruptCallback(unsigned char mode);
-static int CZ80LIB_MemEqu(char *a, char *b, int lena, int lenb);
+static int CZ80LIB_MemEqu(char* a, char* b, int lena, int lenb);
 static int CZ80LIB_SignExt16(int val);
 static CZ80LIB_InstructionInfo CZ80LIB_InstructionLookup(unsigned char opcode, unsigned char table);
 //Creates a new CZ80LIB_Machine with the
@@ -68,21 +68,21 @@ extern void CZ80LIB_Reset(CZ80LIB_Machine* mm);
 //instruction at the current memory address. If it
 //encounters the HALT instruction, then the status
 //will be changed to CZ80LIB_IDLE.
-extern void CZ80LIB_Step(CZ80LIB_Machine *mm);
+extern void CZ80LIB_Step(CZ80LIB_Machine* mm);
 //Sets the status of the machine to CZ80LIB_RUNNING.
-extern void CZ80LIB_Cont(CZ80LIB_Machine *mm);
+extern void CZ80LIB_Cont(CZ80LIB_Machine* mm);
 //Sets the status of the machine to CZ80LIB_IDLE.
-extern void CZ80LIB_Stop(CZ80LIB_Machine *mm);
+extern void CZ80LIB_Stop(CZ80LIB_Machine* mm);
 //Jumps to a memory address (sets PC).
-extern void CZ80LIB_Jump(CZ80LIB_Machine *mm, unsigned short addr);
+extern void CZ80LIB_Jump(CZ80LIB_Machine* mm, unsigned short addr);
 //Begins executing instructions at the current
 //program counter until the HALT instruction is
 //reached. This is a blocking operation.
-extern void CZ80LIB_Trace(CZ80LIB_Machine *mm);
+extern void CZ80LIB_Trace(CZ80LIB_Machine* mm);
 //Jumps to a memory address and begins executing
 //instructions until the HALT instruction is reached.
 //This is a blocking operation.
-extern void CZ80LIB_Run(CZ80LIB_Machine *mm, unsigned short addr);
+extern void CZ80LIB_Run(CZ80LIB_Machine* mm, unsigned short addr);
 //Set the value of a register.
 //Use this rather than trying to access registers directly.
 extern void CZ80LIB_SetReg(CZ80LIB_Machine* mm, unsigned char reg, unsigned short val);
