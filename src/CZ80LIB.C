@@ -5,6 +5,7 @@ static void CZ80LIB_DefaultPortOutCallback(CZ80LIB_Machine* mm, unsigned char po
 	(void)port;
 	(void)value;
 #endif
+	(void)mm;
 }
 static unsigned char CZ80LIB_DefaultPortInCallback(CZ80LIB_Machine* mm, unsigned char port) {
 #ifdef CZ80LIB_VERBOSE
@@ -12,6 +13,7 @@ static unsigned char CZ80LIB_DefaultPortInCallback(CZ80LIB_Machine* mm, unsigned
 #else
 	(void)port;
 #endif
+	(void)mm;
 	return 0;
 }
 static unsigned short CZ80LIB_DefaultInterruptCallback(CZ80LIB_Machine* mm, unsigned char mode) {
@@ -20,6 +22,7 @@ static unsigned short CZ80LIB_DefaultInterruptCallback(CZ80LIB_Machine* mm, unsi
 #else
 	(void)mode;
 #endif
+	(void)mm;
 	return 0;
 }
 static int CZ80LIB_SignExt16(int val) {
@@ -84,17 +87,12 @@ extern void CZ80LIB_Reset(CZ80LIB_Machine* mm) {
 }
 extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 	if (mm->STATUS == CZ80LIB_IDLE) return;
-	const int REG_AF = 0;
-	const int REG_PC = 6;
-	const int REG_SP = 7;
-	const int REG_I = 12;
-	const int REG_R = 13;
-	unsigned char instrop = mm->MEM[mm->REGS[REG_PC]];
+	unsigned char instrop = mm->MEM[mm->REGS[CZ80LIB_REG_PC]];
 	unsigned char instrtbl = mm->TABLE;
 	CZ80LIB_InstructionInfo ii = CZ80LIB_InstructionLookup(instrop, instrtbl);
-	int arg8 = mm->MEM[(mm->REGS[REG_PC] + 1) & 0xFFFF];
-	int arg16 = mm->MEM[(mm->REGS[REG_PC] + 1) & 0xFFFF] | (mm->MEM[(mm->REGS[REG_PC] + 2) & 0xFFFF] << 8);
-	int arg8i = mm->MEM[(mm->REGS[REG_PC] - 1) & 0xFFFF];
+	int arg8 = mm->MEM[(mm->REGS[CZ80LIB_REG_PC] + 1) & 0xFFFF];
+	int arg16 = mm->MEM[(mm->REGS[CZ80LIB_REG_PC] + 1) & 0xFFFF] | (mm->MEM[(mm->REGS[CZ80LIB_REG_PC] + 2) & 0xFFFF] << 8);
+	int arg8i = mm->MEM[(mm->REGS[CZ80LIB_REG_PC] - 1) & 0xFFFF];
 	int i;
 	mm->TABLE = 0;
 
@@ -248,9 +246,9 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 			break;
 			case 15:
 				tmp = (~(1 << op1)) & 0xFFFF;
-				mm->REGS[REG_AF] &= tmp;
+				mm->REGS[CZ80LIB_REG_AF] &= tmp;
 				tmp = (mm->T0 & 1) << op1;
-				mm->REGS[REG_AF] |= tmp;
+				mm->REGS[CZ80LIB_REG_AF] |= tmp;
 			break;
 		}
 	}
@@ -260,14 +258,14 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 		fire = iret & 0xFF;
 		ival = iret >> 8;
 		if (fire) {
-			mm->REGS[REG_SP] -= 2;
-			mm->MEM[mm->REGS[REG_SP]] = mm->REGS[REG_PC] & 0xFF;
-			mm->MEM[mm->REGS[REG_SP] + 1] = mm->REGS[REG_PC] >> 8;
+			mm->REGS[CZ80LIB_REG_SP] -= 2;
+			mm->MEM[mm->REGS[CZ80LIB_REG_SP]] = mm->REGS[CZ80LIB_REG_PC] & 0xFF;
+			mm->MEM[mm->REGS[CZ80LIB_REG_SP] + 1] = mm->REGS[CZ80LIB_REG_PC] >> 8;
 			if (mm->INT_MODE == 1) {
-				mm->REGS[REG_PC] = 0x0038;
+				mm->REGS[CZ80LIB_REG_PC] = 0x0038;
 			} else {
-				unsigned short iaddr = (mm->REGS[REG_I] << 8) | ival;
-				mm->REGS[REG_PC] = mm->MEM[iaddr] | (mm->MEM[iaddr + 1] << 8);
+				unsigned short iaddr = (mm->REGS[CZ80LIB_REG_I] << 8) | ival;
+				mm->REGS[CZ80LIB_REG_PC] = mm->MEM[iaddr] | (mm->MEM[iaddr + 1] << 8);
 			}
 		}
 	}
