@@ -1,4 +1,4 @@
-static void CZ80LIB_DefaultPortOutCallback(unsigned char port, unsigned char value) {
+static void CZ80LIB_DefaultPortOutCallback(CZ80LIB_Machine* mm, unsigned char port, unsigned char value) {
 #ifdef CZ80LIB_VERBOSE
 	fprintf(stderr, "WARNING: An unhandled write of value %i to port %i occurred.\n", value, port);
 #else
@@ -6,7 +6,7 @@ static void CZ80LIB_DefaultPortOutCallback(unsigned char port, unsigned char val
 	(void)value;
 #endif
 }
-static unsigned char CZ80LIB_DefaultPortInCallback(unsigned char port) {
+static unsigned char CZ80LIB_DefaultPortInCallback(CZ80LIB_Machine* mm, unsigned char port) {
 #ifdef CZ80LIB_VERBOSE
 	fprintf(stderr, "WARNING: An unhandled read from port %i occurred.\n", port);
 #else
@@ -14,7 +14,7 @@ static unsigned char CZ80LIB_DefaultPortInCallback(unsigned char port) {
 #endif
 	return 0;
 }
-static unsigned short CZ80LIB_DefaultInterruptCallback(unsigned char mode) {
+static unsigned short CZ80LIB_DefaultInterruptCallback(CZ80LIB_Machine* mm, unsigned char mode) {
 #ifdef CZ80LIB_VERBOSE
 	fprintf(stderr, "WARNING: Interrupts are enabled but unhandled.\n");
 #else
@@ -48,24 +48,22 @@ static CZ80LIB_InstructionInfo CZ80LIB_InstructionLookup(unsigned char opcode, u
 	}
 	return ii;
 }
-extern CZ80LIB_Machine CZ80LIB_NewMachine() {
-	CZ80LIB_Machine mm;
+extern void CZ80LIB_InitMachine(CZ80LIB_Machine* mm) {
 	int i;
 	for (i = 0; i < 14; i++) {
-		mm.REGS[i] = 0;
+		mm->REGS[i] = 0;
 	}
 	for (i = 0; i < 65536; i++) {
-		mm.MEM[i] = 0;
+		mm->MEM[i] = 0;
 	}
-	mm.T0 = 0;
-	mm.T1 = 0;
-	mm.TABLE = 0;
-	mm.INT_ENABLED = 0;
-	mm.INT_MODE = 0;
-	mm.PortOutCallback = CZ80LIB_DefaultPortOutCallback;
-	mm.PortInCallback = CZ80LIB_DefaultPortInCallback;
-	mm.InterruptCallback = CZ80LIB_DefaultInterruptCallback;
-	return mm;
+	mm->T0 = 0;
+	mm->T1 = 0;
+	mm->TABLE = 0;
+	mm->INT_ENABLED = 0;
+	mm->INT_MODE = 0;
+	mm->PortOutCallback = CZ80LIB_DefaultPortOutCallback;
+	mm->PortInCallback = CZ80LIB_DefaultPortInCallback;
+	mm->InterruptCallback = CZ80LIB_DefaultInterruptCallback;
 }
 extern void CZ80LIB_Reset(CZ80LIB_Machine* mm) {
 	int i;
@@ -212,9 +210,9 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 				} else if (op1 == 2) {
 					mm->T0 = arg8i;
 				} else if (op1 == 3) {
-					mm->PortOutCallback(mm->T1, mm->T0);
+					mm->PortOutCallback(mm, mm->T1, mm->T0);
 				} else if (op1 == 4) {
-					mm->T0 = mm->PortInCallback(mm->T1);
+					mm->T0 = mm->PortInCallback(mm, mm->T1);
 				}
 			break;
 			case 12:
@@ -258,7 +256,7 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 	}
 	if (mm->INT_ENABLED && mm->INT_MODE > 0) {
 		unsigned char fire, ival;
-		unsigned short iret = mm->InterruptCallback(mm->INT_MODE);
+		unsigned short iret = mm->InterruptCallback(mm, mm->INT_MODE);
 		fire = iret & 0xFF;
 		ival = iret >> 8;
 		if (fire) {

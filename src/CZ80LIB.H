@@ -1,6 +1,7 @@
 #ifndef __CZ80LIB_H__
 #define __CZ80LIB_H__
-typedef struct { //!show struct
+typedef struct CZ80LIB_Machine CZ80LIB_Machine;
+struct CZ80LIB_Machine { //!show struct
 	int T0, T1, ST0, ST1, INT_ENABLED, INT_MODE, TABLE, STATUS;
 	int REGS[14];
 	////!show struct The program memory is located here.
@@ -8,11 +9,11 @@ typedef struct { //!show struct
 	////!show struct This callback is executed whenever
 	////!show struct the interpreter encounters an OUT
 	////!show struct instruction.
-	void (*PortOutCallback)(unsigned char, unsigned char); //!show struct
+	void (*PortOutCallback)(CZ80LIB_Machine*, unsigned char, unsigned char); //!show struct
 	////!show struct This callback is executed whenever
 	////!show struct the interpreter encounters an IN
 	////!show struct instruction.
-	unsigned char (*PortInCallback)(unsigned char); //!show struct
+	unsigned char (*PortInCallback)(CZ80LIB_Machine*, unsigned char); //!show struct
 	////!show struct This callback is executed
 	////!show struct repeatedly when interrupts are
 	////!show struct enabled. The lower byte is 1 or 0
@@ -21,8 +22,8 @@ typedef struct { //!show struct
 	////!show struct upper byte is used for Mode 2
 	////!show struct interrupts as the value combined
 	////!show struct combined with the I register.
-	unsigned short (*InterruptCallback)(unsigned char); //!show struct
-} CZ80LIB_Machine; //!show struct
+	unsigned short (*InterruptCallback)(CZ80LIB_Machine*, unsigned char); //!show struct
+}; //!show struct
 //Instruction info
 typedef struct {
 	unsigned char OpCode, Table;
@@ -66,15 +67,15 @@ typedef struct {
 #define CZ80LIB_REG_IXL 205
 #define CZ80LIB_REG_IYH 106
 #define CZ80LIB_REG_IYL 206
-static void CZ80LIB_DefaultPortOutCallback(unsigned char port, unsigned char value);
-static unsigned char CZ80LIB_DefaultPortInCallback(unsigned char port);
-static unsigned short CZ80LIB_DefaultInterruptCallback(unsigned char mode);
+static void CZ80LIB_DefaultPortOutCallback(CZ80LIB_Machine* mm, unsigned char port, unsigned char value);
+static unsigned char CZ80LIB_DefaultPortInCallback(CZ80LIB_Machine* mm, unsigned char port);
+static unsigned short CZ80LIB_DefaultInterruptCallback(CZ80LIB_Machine* mm, unsigned char mode);
 static int CZ80LIB_MemEqu(char* a, char* b, int lena, int lenb);
 static int CZ80LIB_SignExt16(int val);
 static CZ80LIB_InstructionInfo CZ80LIB_InstructionLookup(unsigned char opcode, unsigned char table);
 //Creates a new CZ80LIB_Machine with the
 //default values set.
-extern CZ80LIB_Machine CZ80LIB_NewMachine();
+extern void CZ80LIB_InitMachine(CZ80LIB_Machine* mm);
 //Resets a CZ80LIB_Machine to its default values.
 extern void CZ80LIB_Reset(CZ80LIB_Machine* mm);
 //If the status of the machine is CZ80LIB_RUNNING and
