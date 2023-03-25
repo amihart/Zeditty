@@ -97,6 +97,7 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 	mm->TABLE = 0;
 
 	for (i = 0; i < ii.SimplifiedLength; i++) {
+
 		int op0 = ii.Simplified[i] >> 4;
 		int op1 = ii.Simplified[i] & 0xF;
 		int tmp;
@@ -206,7 +207,7 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 				} else if (op1 == 1) {
 					mm->T0 = arg16;
 				} else if (op1 == 2) {
-					mm->T0 = arg8i;
+					mm->T0 = arg8i & 0xFF;
 				} else if (op1 == 3) {
 					mm->PortOutCallback(mm, mm->T1, mm->T0);
 				} else if (op1 == 4) {
@@ -390,4 +391,33 @@ extern unsigned short CZ80LIB_GetParameter(CZ80LIB_Machine* mm, unsigned short n
 }
 extern void CZ80LIB_Return(CZ80LIB_Machine* mm, unsigned short num) {
 	mm->REGS[CZ80LIB_REG_HL] = num;
+}
+extern char CZ80LIB_Read(CZ80LIB_Machine* mm, unsigned short addr)
+{
+	return mm->MEM[addr];
+}
+extern void CZ80LIB_Write(CZ80LIB_Machine* mm, unsigned short addr, char val)
+{
+	mm->MEM[addr] = val;
+}
+extern char* CZ80LIB_ReadString(CZ80LIB_Machine* mm, unsigned short addr, int* strlen)
+{
+	int strlenr = 0;
+	char* str = malloc(0);
+	strlenr = 0;
+	while (mm->MEM[addr] != 0)
+	{
+		str = realloc(str, strlenr + 1);
+		str[strlenr] = mm->MEM[addr];
+		strlenr++;
+		if (addr >= 65535) break;
+		addr++;
+	}
+	str = realloc(str, strlenr + 1);
+	str[strlenr] = 0;
+	if (strlen != NULL)
+	{
+		*strlen = strlenr;
+	}
+	return str;
 }
