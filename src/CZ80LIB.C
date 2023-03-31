@@ -392,13 +392,22 @@ extern unsigned short CZ80LIB_GetParameter(CZ80LIB_Machine* mm, unsigned short n
 extern void CZ80LIB_Return(CZ80LIB_Machine* mm, unsigned short num) {
 	mm->REGS[CZ80LIB_REG_HL] = num;
 }
-extern char CZ80LIB_Read(CZ80LIB_Machine* mm, unsigned short addr)
+extern char CZ80LIB_ReadByte(CZ80LIB_Machine* mm, unsigned short addr)
 {
 	return mm->MEM[addr];
 }
-extern void CZ80LIB_Write(CZ80LIB_Machine* mm, unsigned short addr, char val)
+extern void CZ80LIB_WriteByte(CZ80LIB_Machine* mm, unsigned short addr, char val)
 {
 	mm->MEM[addr] = val;
+}
+extern unsigned short CZ80LIB_ReadWord(CZ80LIB_Machine* mm, unsigned short addr)
+{
+	return mm->MEM[addr] | (mm->MEM[addr + 1] << 8);
+}
+extern void CZ80LIB_WriteWord(CZ80LIB_Machine* mm, unsigned short addr, unsigned short val)
+{
+	mm->MEM[addr] = val & 0xFF;
+	mm->MEM[(addr + 1) & 0xFFFF] = (val >> 8) & 0xFF;
 }
 extern char* CZ80LIB_ReadString(CZ80LIB_Machine* mm, unsigned short addr, int* strlen)
 {
