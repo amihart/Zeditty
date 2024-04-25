@@ -1,4 +1,4 @@
-cat ../src/zeditty.h | sed "/__REPLACE/{
+cat ../include/zeditty.h | sed "/__REPLACE/{
 r /dev/stdin
 d
 }" doc.template > doc.html
