@@ -1,5 +1,11 @@
-static void CZ80LIB_DefaultPortOutCallback(CZ80LIB_Machine* mm, unsigned char port, unsigned char value) {
-#ifdef CZ80LIB_VERBOSE
+#include <zeditty.h>
+#ifdef z_VERBOSE
+#include <stdio.h>
+#endif
+//#include "zeditty_ops.c"
+
+static void z_DefaultPortOutCallback(z_Machine* mm, unsigned char port, unsigned char value) {
+#ifdef z_VERBOSE
 	fprintf(stderr, "WARNING: An unhandled write of value %i to port %i occurred.\n", value, port);
 #else
 	(void)port;
@@ -7,8 +13,8 @@ static void CZ80LIB_DefaultPortOutCallback(CZ80LIB_Machine* mm, unsigned char po
 #endif
 	(void)mm;
 }
-static unsigned char CZ80LIB_DefaultPortInCallback(CZ80LIB_Machine* mm, unsigned char port) {
-#ifdef CZ80LIB_VERBOSE
+static unsigned char z_DefaultPortInCallback(z_Machine* mm, unsigned char port) {
+#ifdef z_VERBOSE
 	fprintf(stderr, "WARNING: An unhandled read from port %i occurred.\n", port);
 #else
 	(void)port;
@@ -16,8 +22,8 @@ static unsigned char CZ80LIB_DefaultPortInCallback(CZ80LIB_Machine* mm, unsigned
 	(void)mm;
 	return 0;
 }
-static unsigned short CZ80LIB_DefaultInterruptCallback(CZ80LIB_Machine* mm, unsigned char mode) {
-#ifdef CZ80LIB_VERBOSE
+static unsigned short z_DefaultInterruptCallback(z_Machine* mm, unsigned char mode) {
+#ifdef z_VERBOSE
 	fprintf(stderr, "WARNING: Interrupts are enabled but unhandled.\n");
 #else
 	(void)mode;
@@ -25,10 +31,10 @@ static unsigned short CZ80LIB_DefaultInterruptCallback(CZ80LIB_Machine* mm, unsi
 	(void)mm;
 	return 0;
 }
-static int CZ80LIB_SignExt16(int val) {
+static int z_SignExt16(int val) {
 	return (val >> 15) & 1 ? val | 0xFFFF0000 : val;
 }
-static int CZ80LIB_MemEqu(char *a, char *b, int lena, int lenb) {
+static int z_MemEqu(char *a, char *b, int lena, int lenb) {
 	if (lena != lenb) {
 		return 0;
 	}
@@ -38,20 +44,20 @@ static int CZ80LIB_MemEqu(char *a, char *b, int lena, int lenb) {
 	}
 	return 1;
 }
-static CZ80LIB_InstructionInfo CZ80LIB_InstructionLookup(unsigned char opcode, unsigned char table) {
+static z_InstructionInfo z_InstructionLookup(unsigned char opcode, unsigned char table) {
 	unsigned int loc = 3 * (opcode + ((unsigned int)table) * 256);
-	CZ80LIB_InstructionInfo ii;
+	z_InstructionInfo ii;
 	ii.OpCode = opcode;
 	ii.Table = table;
-	ii.SimplifiedLength = CZ80LIB_OPINFO[loc + 2];
-	loc = (CZ80LIB_OPINFO[loc] << 8) | CZ80LIB_OPINFO[loc + 1];
+	ii.SimplifiedLength = z_OPINFO[loc + 2];
+	loc = (z_OPINFO[loc] << 8) | z_OPINFO[loc + 1];
 	int i;
 	for (i = 0; i < ii.SimplifiedLength; i++) {
-		ii.Simplified[i] = CZ80LIB_OPINFO[loc + i];
+		ii.Simplified[i] = z_OPINFO[loc + i];
 	}
 	return ii;
 }
-extern void CZ80LIB_InitMachine(CZ80LIB_Machine* mm) {
+extern void z_InitMachine(z_Machine* mm) {
 	int i;
 	for (i = 0; i < 14; i++) {
 		mm->REGS[i] = 0;
@@ -64,11 +70,11 @@ extern void CZ80LIB_InitMachine(CZ80LIB_Machine* mm) {
 	mm->TABLE = 0;
 	mm->INT_ENABLED = 0;
 	mm->INT_MODE = 0;
-	mm->PortOutCallback = CZ80LIB_DefaultPortOutCallback;
-	mm->PortInCallback = CZ80LIB_DefaultPortInCallback;
-	mm->InterruptCallback = CZ80LIB_DefaultInterruptCallback;
+	mm->PortOutCallback = z_DefaultPortOutCallback;
+	mm->PortInCallback = z_DefaultPortInCallback;
+	mm->InterruptCallback = z_DefaultInterruptCallback;
 }
-extern void CZ80LIB_Reset(CZ80LIB_Machine* mm) {
+extern void z_Reset(z_Machine* mm) {
 	int i;
 	for (i = 0; i < 14; i++) {
 		mm->REGS[i] = 0;
@@ -81,18 +87,18 @@ extern void CZ80LIB_Reset(CZ80LIB_Machine* mm) {
 	mm->TABLE = 0;
 	mm->INT_ENABLED = 0;
 	mm->INT_MODE = 0;
-	mm->PortOutCallback = CZ80LIB_DefaultPortOutCallback;
-	mm->PortInCallback = CZ80LIB_DefaultPortInCallback;
-	mm->InterruptCallback = CZ80LIB_DefaultInterruptCallback;
+	mm->PortOutCallback = z_DefaultPortOutCallback;
+	mm->PortInCallback = z_DefaultPortInCallback;
+	mm->InterruptCallback = z_DefaultInterruptCallback;
 }
-extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
-	if (mm->STATUS == CZ80LIB_IDLE) return;
-	unsigned char instrop = mm->MEM[mm->REGS[CZ80LIB_REG_PC]];
+extern void z_Step(z_Machine *mm) {
+	if (mm->STATUS == z_IDLE) return;
+	unsigned char instrop = mm->MEM[mm->REGS[z_REG_PC]];
 	unsigned char instrtbl = mm->TABLE;
-	CZ80LIB_InstructionInfo ii = CZ80LIB_InstructionLookup(instrop, instrtbl);
-	int arg8 = mm->MEM[(mm->REGS[CZ80LIB_REG_PC] + 1) & 0xFFFF];
-	int arg16 = mm->MEM[(mm->REGS[CZ80LIB_REG_PC] + 1) & 0xFFFF] | (mm->MEM[(mm->REGS[CZ80LIB_REG_PC] + 2) & 0xFFFF] << 8);
-	int arg8i = mm->MEM[(mm->REGS[CZ80LIB_REG_PC] - 1) & 0xFFFF];
+	z_InstructionInfo ii = z_InstructionLookup(instrop, instrtbl);
+	int arg8 = mm->MEM[(mm->REGS[z_REG_PC] + 1) & 0xFFFF];
+	int arg16 = mm->MEM[(mm->REGS[z_REG_PC] + 1) & 0xFFFF] | (mm->MEM[(mm->REGS[z_REG_PC] + 2) & 0xFFFF] << 8);
+	int arg8i = mm->MEM[(mm->REGS[z_REG_PC] - 1) & 0xFFFF];
 	int i;
 	mm->TABLE = 0;
 
@@ -225,11 +231,11 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 				} else if (op1 == 2) {
 					mm->T0 &= 0xFF00;
 				} else if (op1 == 3) {
-					#ifdef CZ80LIB_VERBOSE
+					#ifdef z_VERBOSE
 					fprintf(stderr, "An unimplemented instruction was used (OP: %X; TBL: %i).\n", instrop, instrtbl);
 					#endif
 				} else if (op1 == 4) {
-					#ifdef CZ80LIB_VERBOSE
+					#ifdef z_VERBOSE
 					fprintf(stderr, "An invalid instruction was used (OP: %X, TBL: %i).\n", instrop, instrtbl);
 					#endif
 				} else if (op1 == 5) {
@@ -247,9 +253,9 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 			break;
 			case 15:
 				tmp = (~(1 << op1)) & 0xFFFF;
-				mm->REGS[CZ80LIB_REG_AF] &= tmp;
+				mm->REGS[z_REG_AF] &= tmp;
 				tmp = (mm->T0 & 1) << op1;
-				mm->REGS[CZ80LIB_REG_AF] |= tmp;
+				mm->REGS[z_REG_AF] |= tmp;
 			break;
 		}
 	}
@@ -259,157 +265,157 @@ extern void CZ80LIB_Step(CZ80LIB_Machine *mm) {
 		fire = iret & 0xFF;
 		ival = iret >> 8;
 		if (fire) {
-			mm->REGS[CZ80LIB_REG_SP] -= 2;
-			mm->MEM[mm->REGS[CZ80LIB_REG_SP]] = mm->REGS[CZ80LIB_REG_PC] & 0xFF;
-			mm->MEM[mm->REGS[CZ80LIB_REG_SP] + 1] = mm->REGS[CZ80LIB_REG_PC] >> 8;
+			mm->REGS[z_REG_SP] -= 2;
+			mm->MEM[mm->REGS[z_REG_SP]] = mm->REGS[z_REG_PC] & 0xFF;
+			mm->MEM[mm->REGS[z_REG_SP] + 1] = mm->REGS[z_REG_PC] >> 8;
 			if (mm->INT_MODE == 1) {
-				mm->REGS[CZ80LIB_REG_PC] = 0x0038;
+				mm->REGS[z_REG_PC] = 0x0038;
 			} else {
-				unsigned short iaddr = (mm->REGS[CZ80LIB_REG_I] << 8) | ival;
-				mm->REGS[CZ80LIB_REG_PC] = mm->MEM[iaddr] | (mm->MEM[iaddr + 1] << 8);
+				unsigned short iaddr = (mm->REGS[z_REG_I] << 8) | ival;
+				mm->REGS[z_REG_PC] = mm->MEM[iaddr] | (mm->MEM[iaddr + 1] << 8);
 			}
 		}
 	}
 }
-extern void CZ80LIB_Cont(CZ80LIB_Machine *mm) {
-	mm->STATUS = CZ80LIB_RUNNING;
+extern void z_Cont(z_Machine *mm) {
+	mm->STATUS = z_RUNNING;
 }
-extern void CZ80LIB_Stop(CZ80LIB_Machine *mm) {
-	mm->STATUS = CZ80LIB_IDLE;
+extern void z_Stop(z_Machine *mm) {
+	mm->STATUS = z_IDLE;
 }
-extern void CZ80LIB_Jump(CZ80LIB_Machine *mm, unsigned short addr) {
-	mm->REGS[CZ80LIB_REG_PC] = addr;
+extern void z_Jump(z_Machine *mm, unsigned short addr) {
+	mm->REGS[z_REG_PC] = addr;
 }
-extern void CZ80LIB_Trace(CZ80LIB_Machine *mm) {
-	CZ80LIB_Cont(mm);
-	while (mm->STATUS == CZ80LIB_RUNNING) {
-		CZ80LIB_Step(mm);
+extern void z_Trace(z_Machine *mm) {
+	z_Cont(mm);
+	while (mm->STATUS == z_RUNNING) {
+		z_Step(mm);
 	}
 }
-extern void CZ80LIB_Run(CZ80LIB_Machine *mm, unsigned short addr) {
-	CZ80LIB_Jump(mm, addr);
-	CZ80LIB_Trace(mm);
+extern void z_Run(z_Machine *mm, unsigned short addr) {
+	z_Jump(mm, addr);
+	z_Trace(mm);
 }
-extern void CZ80LIB_SetReg(CZ80LIB_Machine* mm, unsigned char reg, unsigned short val) {
+extern void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val) {
 	switch (reg) {
-		case CZ80LIB_REG_AF:
-		case CZ80LIB_REG_BC:
-		case CZ80LIB_REG_DE:
-		case CZ80LIB_REG_HL:
-		case CZ80LIB_REG_IX:
-		case CZ80LIB_REG_IY:
-		case CZ80LIB_REG_PC:
-		case CZ80LIB_REG_SP:
-		case CZ80LIB_REG_AFS:
-		case CZ80LIB_REG_BCS:
-		case CZ80LIB_REG_DES:
-		case CZ80LIB_REG_HLS:
+		case z_REG_AF:
+		case z_REG_BC:
+		case z_REG_DE:
+		case z_REG_HL:
+		case z_REG_IX:
+		case z_REG_IY:
+		case z_REG_PC:
+		case z_REG_SP:
+		case z_REG_AFS:
+		case z_REG_BCS:
+		case z_REG_DES:
+		case z_REG_HLS:
 			mm->REGS[reg] = val;
 		break;
-		case CZ80LIB_REG_A:
-		case CZ80LIB_REG_B:
-		case CZ80LIB_REG_D:
-		case CZ80LIB_REG_H:
-		case CZ80LIB_REG_IXH:
-		case CZ80LIB_REG_IYH:
-		case CZ80LIB_REG_AS:
-		case CZ80LIB_REG_BS:
-		case CZ80LIB_REG_DS:
-		case CZ80LIB_REG_HS:
+		case z_REG_A:
+		case z_REG_B:
+		case z_REG_D:
+		case z_REG_H:
+		case z_REG_IXH:
+		case z_REG_IYH:
+		case z_REG_AS:
+		case z_REG_BS:
+		case z_REG_DS:
+		case z_REG_HS:
 			mm->REGS[reg - 100] = (mm->REGS[reg - 100] & 0xFF) | ((val & 0xFF) << 8);
 		break;
-		case CZ80LIB_REG_F:
-		case CZ80LIB_REG_C:
-		case CZ80LIB_REG_E:
-		case CZ80LIB_REG_L:
-		case CZ80LIB_REG_IXL:
-		case CZ80LIB_REG_IYL:
-		case CZ80LIB_REG_FS:
-		case CZ80LIB_REG_CS:
-		case CZ80LIB_REG_ES:
-		case CZ80LIB_REG_LS:
+		case z_REG_F:
+		case z_REG_C:
+		case z_REG_E:
+		case z_REG_L:
+		case z_REG_IXL:
+		case z_REG_IYL:
+		case z_REG_FS:
+		case z_REG_CS:
+		case z_REG_ES:
+		case z_REG_LS:
 			mm->REGS[reg - 200] = (mm->REGS[reg - 200] & 0xFF00) | (val & 0xFF);
 		break;
-		case CZ80LIB_REG_I:
+		case z_REG_I:
 			mm->REGS[reg] = val & 0xFF;
 		break;
-		case CZ80LIB_REG_R:
+		case z_REG_R:
 			mm->REGS[reg] = val & 0x7F;
 		break;
 	}
 }
-extern unsigned short CZ80LIB_GetReg(CZ80LIB_Machine* mm, unsigned char reg) {
+extern unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
 	switch (reg) {
-		case CZ80LIB_REG_AF:
-		case CZ80LIB_REG_BC:
-		case CZ80LIB_REG_DE:
-		case CZ80LIB_REG_HL:
-		case CZ80LIB_REG_IX:
-		case CZ80LIB_REG_IY:
-		case CZ80LIB_REG_PC:
-		case CZ80LIB_REG_SP:
-		case CZ80LIB_REG_AFS:
-		case CZ80LIB_REG_BCS:
-		case CZ80LIB_REG_DES:
-		case CZ80LIB_REG_HLS:
-		case CZ80LIB_REG_I:
-		case CZ80LIB_REG_R:
+		case z_REG_AF:
+		case z_REG_BC:
+		case z_REG_DE:
+		case z_REG_HL:
+		case z_REG_IX:
+		case z_REG_IY:
+		case z_REG_PC:
+		case z_REG_SP:
+		case z_REG_AFS:
+		case z_REG_BCS:
+		case z_REG_DES:
+		case z_REG_HLS:
+		case z_REG_I:
+		case z_REG_R:
 			return mm->REGS[reg];
 		break;
-		case CZ80LIB_REG_A:
-		case CZ80LIB_REG_B:
-		case CZ80LIB_REG_D:
-		case CZ80LIB_REG_H:
-		case CZ80LIB_REG_IXH:
-		case CZ80LIB_REG_IYH:
-		case CZ80LIB_REG_AS:
-		case CZ80LIB_REG_BS:
-		case CZ80LIB_REG_DS:
-		case CZ80LIB_REG_HS:
+		case z_REG_A:
+		case z_REG_B:
+		case z_REG_D:
+		case z_REG_H:
+		case z_REG_IXH:
+		case z_REG_IYH:
+		case z_REG_AS:
+		case z_REG_BS:
+		case z_REG_DS:
+		case z_REG_HS:
 			return mm->REGS[reg - 100] >> 8;
 		break;
-		case CZ80LIB_REG_F:
-		case CZ80LIB_REG_C:
-		case CZ80LIB_REG_E:
-		case CZ80LIB_REG_L:
-		case CZ80LIB_REG_IXL:
-		case CZ80LIB_REG_IYL:
-		case CZ80LIB_REG_FS:
-		case CZ80LIB_REG_CS:
-		case CZ80LIB_REG_ES:
-		case CZ80LIB_REG_LS:
+		case z_REG_F:
+		case z_REG_C:
+		case z_REG_E:
+		case z_REG_L:
+		case z_REG_IXL:
+		case z_REG_IYL:
+		case z_REG_FS:
+		case z_REG_CS:
+		case z_REG_ES:
+		case z_REG_LS:
 			return mm->REGS[reg - 200] & 0xFF;
 		break;
 	}
 	return 0;
 }
-extern unsigned short CZ80LIB_GetParameter(CZ80LIB_Machine* mm, unsigned short num) {
-	unsigned short addr = (mm->REGS[CZ80LIB_REG_SP]) + (num * 2) + 2;
+extern unsigned short z_GetParameter(z_Machine* mm, unsigned short num) {
+	unsigned short addr = (mm->REGS[z_REG_SP]) + (num * 2) + 2;
 	unsigned short ret = mm->MEM[addr++];
 	ret |= mm->MEM[addr] << 8;
 	return ret;
 }
-extern void CZ80LIB_Return(CZ80LIB_Machine* mm, unsigned short num) {
-	mm->REGS[CZ80LIB_REG_HL] = num;
+extern void z_Return(z_Machine* mm, unsigned short num) {
+	mm->REGS[z_REG_HL] = num;
 }
-extern char CZ80LIB_ReadByte(CZ80LIB_Machine* mm, unsigned short addr)
+extern char z_ReadByte(z_Machine* mm, unsigned short addr)
 {
 	return mm->MEM[addr];
 }
-extern void CZ80LIB_WriteByte(CZ80LIB_Machine* mm, unsigned short addr, char val)
+extern void z_WriteByte(z_Machine* mm, unsigned short addr, char val)
 {
 	mm->MEM[addr] = val;
 }
-extern unsigned short CZ80LIB_ReadWord(CZ80LIB_Machine* mm, unsigned short addr)
+extern unsigned short z_ReadWord(z_Machine* mm, unsigned short addr)
 {
 	return mm->MEM[addr] | (mm->MEM[addr + 1] << 8);
 }
-extern void CZ80LIB_WriteWord(CZ80LIB_Machine* mm, unsigned short addr, unsigned short val)
+extern void z_WriteWord(z_Machine* mm, unsigned short addr, unsigned short val)
 {
 	mm->MEM[addr] = val & 0xFF;
 	mm->MEM[(addr + 1) & 0xFFFF] = (val >> 8) & 0xFF;
 }
-extern char* CZ80LIB_ReadString(CZ80LIB_Machine* mm, unsigned short addr, int* strlen)
+extern char* z_ReadString(z_Machine* mm, unsigned short addr, int* strlen)
 {
 	int strlenr = 0;
 	char* str = malloc(0);

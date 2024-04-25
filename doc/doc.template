@@ -36,7 +36,7 @@ function displayEntry(e) {
 	p2.innerHTML = addColor(p2.innerHTML, "void", "darkgreen");
 	p2.innerHTML = addColor(p2.innerHTML, "unsigned", "darkgreen");
 	p2.innerHTML = addColor(p2.innerHTML, "short", "darkgreen");
-	p2.innerHTML = addColor(p2.innerHTML, "CZ80LIB_Machine", "darkgreen");
+	p2.innerHTML = addColor(p2.innerHTML, "zeditty_Machine", "darkgreen");
 	p2.innerHTML = addColor(p2.innerHTML, "mm", "darkred");
 	p2.innerHTML = addColor(p2.innerHTML, "reg", "darkred");
 	p2.innerHTML = addColor(p2.innerHTML, "addr", "darkred");
@@ -61,7 +61,7 @@ for (var i = 0; i < headerFile.length; i++) {
 		var documentation = documentationArray.reverse().join(" ");
 		entriesToDisplay.push({'signature': signature, 'documentation': documentation});
 	}
-	var f = "#define CZ80LIB_";
+	var f = "#define zeditty_";
 	if (headerFile[i].trim().substr(0, f.length) == f) {
 		f = headerFile[i].split(" ");
 		constantsToDisplay.push({'name': f[1], 'value': f[2]});
@@ -122,7 +122,7 @@ txt = addColor(txt, "void", "darkgreen");
 txt = addColor(txt, "unsigned", "darkgreen");
 txt = addColor(txt, "short", "darkgreen");
 txt = addColor(txt, "char", "darkgreen");
-txt = addColor(txt, "CZ80LIB_Machine", "darkgreen");
+txt = addColor(txt, "zeditty_Machine", "darkgreen");
 txt = addColor(txt, "typedef", "darkgreen");
 txt = addColor(txt, "struct ", "darkgreen");
 var pre = document.createElement("pre");
