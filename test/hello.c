@@ -9,6 +9,10 @@ void main()
 	while ( (c = getchar()) != '\n' )
 	{
 		name[p++] = c;
+		if (p == sizeof(name) - 1)
+		{
+			break;
+		}
 	}
 	name[p] = 0;
 	printf("Hello, %s!\n", name);

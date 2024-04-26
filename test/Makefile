@@ -6,6 +6,7 @@ all:
 	sdcc crt0.rel -mz80 --no-std-crt0 hello.c -o ~tmp.hex
 	srec_cat ~tmp.hex -Intel -Output -Binary > hello.z80
 	rm -f ~tmp*
-
+	@echo "Running test..."
+	./interpret hello.z80
 clean:
 	rm -f interpret crt0.rel hello.z80

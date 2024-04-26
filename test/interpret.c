@@ -22,15 +22,25 @@ unsigned char ports_in(z_Machine *mm, unsigned char port)
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
+	if (argc != 2)
+	{
+		fprintf(stderr, "Usage: %s [file]\n", argv[0]);
+		exit(1);
+	}
 	//Setup our virtual machine
 	z_Machine mm;
 	z_InitMachine(&mm);
 	mm.PortOutCallback = ports_out;
 	mm.PortInCallback = ports_in;
 	//Load our program
-	FILE *f = fopen("hello.z80", "r");
+	FILE *f = fopen(argv[1], "r");
+	if (!f)
+	{
+		fprintf(stderr, "File `%s` not found.\n", argv[1]);
+		exit(1);
+	}
 	for (int c, i = 0; (c = fgetc(f)) != EOF; i++)
 	{
 		mm.MEM[i] = (unsigned char)c;
