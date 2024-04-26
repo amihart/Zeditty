@@ -52,8 +52,9 @@ var entriesToDisplay = new Array(0);
 var constantsToDisplay = new Array(0);
 var structsToDisplay = new Array(0);
 for (var i = 0; i < headerFile.length; i++) {
-	if (headerFile[i].trim().substr(0, 7) == "extern ") {
-		var signature = headerFile[i].replace("extern ", "");
+	if (headerFile[i].includes("//!show func")) {
+		headerFile[i] = headerFile[i].replace("//!show func", "");
+		var signature = headerFile[i];//.replace("extern ", "");
 		var documentationArray = new Array(0);
 		for (var j = i - 1; headerFile[j].trim().substr(0, 2) == "//"; j--) {
 			documentationArray.push(headerFile[j].trim().replace("//", ""));
