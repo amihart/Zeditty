@@ -43,7 +43,8 @@ int main(int argc, char **argv)
 	}
 	for (int c, i = 0; (c = fgetc(f)) != EOF; i++)
 	{
-		mm.MEM[i] = (unsigned char)c;
+		unsigned char b = (unsigned char)c;
+		z_WriteData(&mm, i, &b, 1);
 	}
 	fclose(f);
 	//Run the program
