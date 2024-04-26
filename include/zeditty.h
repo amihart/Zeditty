@@ -76,48 +76,39 @@ static int z_SignExt16(int val);
 static z_InstructionInfo z_InstructionLookup(unsigned char opcode, unsigned char table);
 //Creates a new z_Machine with the
 //default values set.
-extern void z_InitMachine(z_Machine* mm);
+void z_InitMachine(z_Machine* mm);
 //Resets a z_Machine to its default values.
-extern void z_Reset(z_Machine* mm);
+void z_Reset(z_Machine* mm);
 //If the status of the machine is z_RUNNING and
 //not z_IDLE, then this will execute a single
 //instruction at the current memory address. If it
 //encounters the HALT instruction, then the status
 //will be changed to z_IDLE.
-extern void z_Step(z_Machine* mm);
+void z_Step(z_Machine* mm);
 //Sets the status of the machine to z_RUNNING.
-extern void z_Cont(z_Machine* mm);
+void z_Cont(z_Machine* mm);
 //Sets the status of the machine to z_IDLE.
-extern void z_Stop(z_Machine* mm);
+void z_Stop(z_Machine* mm);
 //Jumps to a memory address (sets PC).
-extern void z_Jump(z_Machine* mm, unsigned short addr);
+void z_Jump(z_Machine* mm, unsigned short addr);
 //Begins executing instructions at the current
 //program counter until the HALT instruction is
 //reached. This is a blocking operation.
-extern void z_Trace(z_Machine* mm);
+void z_Trace(z_Machine* mm);
 //Jumps to a memory address and begins executing
 //instructions until the HALT instruction is reached.
 //This is a blocking operation.
-extern void z_Run(z_Machine* mm, unsigned short addr);
+void z_Run(z_Machine* mm, unsigned short addr);
 //Set the value of a register.
 //Use this rather than trying to access registers directly.
-extern void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val);
+void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val);
 //Gets the value of a register.
-extern unsigned short z_GetReg(z_Machine* mm, unsigned char reg);
-//If compiling Z80 code with the Small Device C compiler
-//	and a port read/write callback is triggered
-//	at the top of that function, then this can be
-//	be used to get the parameters passed into that
-//	function, assuming the parameters are all
-//	2 bytes long (pointers/shorts/ints).
-extern unsigned short z_GetParameter(z_Machine* mm, unsigned short num);
-//If compiling Z80 code with the Small Device C compiler
-//	and a port read/write callback is triggered
-//	at the top of that function, then this can be
-//	be used to set the return value of that
-//	function, assuming the function returns a data
-//	type that is 2 bytes long (pointers/shorts/ints).
-extern void z_Return(z_Machine* mm, unsigned short num);
-//opcode information
+unsigned short z_GetReg(z_Machine* mm, unsigned char reg);
+//Read data from memory
+void z_ReadData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen);
+//Write data to memory
+void z_WriteData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen);
+//used internally
 extern const unsigned char z_OPINFO[45785];
 #endif
+

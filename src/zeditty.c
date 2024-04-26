@@ -56,7 +56,7 @@ static z_InstructionInfo z_InstructionLookup(unsigned char opcode, unsigned char
 	}
 	return ii;
 }
-extern void z_InitMachine(z_Machine* mm) {
+void z_InitMachine(z_Machine* mm) {
 	int i;
 	for (i = 0; i < 14; i++) {
 		mm->REGS[i] = 0;
@@ -73,7 +73,7 @@ extern void z_InitMachine(z_Machine* mm) {
 	mm->PortInCallback = z_DefaultPortInCallback;
 	mm->InterruptCallback = z_DefaultInterruptCallback;
 }
-extern void z_Reset(z_Machine* mm) {
+void z_Reset(z_Machine* mm) {
 	int i;
 	for (i = 0; i < 14; i++) {
 		mm->REGS[i] = 0;
@@ -90,7 +90,7 @@ extern void z_Reset(z_Machine* mm) {
 	mm->PortInCallback = z_DefaultPortInCallback;
 	mm->InterruptCallback = z_DefaultInterruptCallback;
 }
-extern void z_Step(z_Machine *mm) {
+void z_Step(z_Machine *mm) {
 	if (mm->STATUS == z_IDLE) return;
 	unsigned char instrop = mm->MEM[mm->REGS[z_REG_PC]];
 	unsigned char instrtbl = mm->TABLE;
@@ -276,26 +276,26 @@ extern void z_Step(z_Machine *mm) {
 		}
 	}
 }
-extern void z_Cont(z_Machine *mm) {
+void z_Cont(z_Machine *mm) {
 	mm->STATUS = z_RUNNING;
 }
-extern void z_Stop(z_Machine *mm) {
+void z_Stop(z_Machine *mm) {
 	mm->STATUS = z_IDLE;
 }
-extern void z_Jump(z_Machine *mm, unsigned short addr) {
+void z_Jump(z_Machine *mm, unsigned short addr) {
 	mm->REGS[z_REG_PC] = addr;
 }
-extern void z_Trace(z_Machine *mm) {
+void z_Trace(z_Machine *mm) {
 	z_Cont(mm);
 	while (mm->STATUS == z_RUNNING) {
 		z_Step(mm);
 	}
 }
-extern void z_Run(z_Machine *mm, unsigned short addr) {
+void z_Run(z_Machine *mm, unsigned short addr) {
 	z_Jump(mm, addr);
 	z_Trace(mm);
 }
-extern void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val) {
+void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val) {
 	switch (reg) {
 		case z_REG_AF:
 		case z_REG_BC:
@@ -343,7 +343,7 @@ extern void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val) {
 		break;
 	}
 }
-extern unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
+unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
 	switch (reg) {
 		case z_REG_AF:
 		case z_REG_BC:
@@ -388,50 +388,26 @@ extern unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
 	}
 	return 0;
 }
-extern unsigned short z_GetParameter(z_Machine* mm, unsigned short num) {
+unsigned short z_GetParameter(z_Machine* mm, unsigned short num) {
 	unsigned short addr = (mm->REGS[z_REG_SP]) + (num * 2) + 2;
 	unsigned short ret = mm->MEM[addr++];
 	ret |= mm->MEM[addr] << 8;
 	return ret;
 }
-extern void z_Return(z_Machine* mm, unsigned short num) {
+void z_Return(z_Machine* mm, unsigned short num) {
 	mm->REGS[z_REG_HL] = num;
 }
-extern char z_ReadByte(z_Machine* mm, unsigned short addr)
+void z_ReadData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen)
 {
-	return mm->MEM[addr];
-}
-extern void z_WriteByte(z_Machine* mm, unsigned short addr, char val)
-{
-	mm->MEM[addr] = val;
-}
-extern unsigned short z_ReadWord(z_Machine* mm, unsigned short addr)
-{
-	return mm->MEM[addr] | (mm->MEM[addr + 1] << 8);
-}
-extern void z_WriteWord(z_Machine* mm, unsigned short addr, unsigned short val)
-{
-	mm->MEM[addr] = val & 0xFF;
-	mm->MEM[(addr + 1) & 0xFFFF] = (val >> 8) & 0xFF;
-}
-extern char* z_ReadString(z_Machine* mm, unsigned short addr, int* strlen)
-{
-	int strlenr = 0;
-	char* str = malloc(0);
-	strlenr = 0;
-	while (mm->MEM[addr] != 0)
+	for (int i = 0; i < strlen; i++)
 	{
-		str = realloc(str, strlenr + 1);
-		str[strlenr] = mm->MEM[addr];
-		strlenr++;
-		if (addr >= 65535) break;
-		addr++;
+		data[i] = mm->MEM[ (i + addr) % 65536 ];
 	}
-	str = realloc(str, strlenr + 1);
-	str[strlenr] = 0;
-	if (strlen != NULL)
+}
+void z_WriteData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen)
+{
+	for (int i = 0; i < strlen; i++)
 	{
-		*strlen = strlenr;
+		mm->MEM[ (i + addr) % 65536 ] = data[i];
 	}
-	return str;
 }
