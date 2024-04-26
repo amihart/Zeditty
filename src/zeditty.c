@@ -2,7 +2,6 @@
 #ifdef z_VERBOSE
 #include <stdio.h>
 #endif
-//#include "zeditty_ops.c"
 
 static void z_DefaultPortOutCallback(z_Machine* mm, unsigned char port, unsigned char value) {
 #ifdef z_VERBOSE

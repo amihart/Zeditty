@@ -1,4 +1,6 @@
 all:
+	sh -c 'which sdcc || (echo Please install: sdcc && exit 1)'
+	sh -c 'which srec_cat || (echo Please install: srecord && exit 1)'
 	gcc interpret.c -o interpret -I../include -L../lib -lzeditty
 	sdasz80 -o crt0.rel crt0.s
 	sdcc crt0.rel -mz80 --no-std-crt0 hello.c -o ~tmp.hex
