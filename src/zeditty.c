@@ -343,7 +343,7 @@ void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val) {
 		break;
 	}
 }
-unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
+void z_GetReg(z_Machine* mm, unsigned char reg, unsigned short* val) {
 	switch (reg) {
 		case z_REG_AF:
 		case z_REG_BC:
@@ -359,7 +359,7 @@ unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
 		case z_REG_HLS:
 		case z_REG_I:
 		case z_REG_R:
-			return mm->REGS[reg];
+			*val = mm->REGS[reg];
 		break;
 		case z_REG_A:
 		case z_REG_B:
@@ -371,7 +371,7 @@ unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
 		case z_REG_BS:
 		case z_REG_DS:
 		case z_REG_HS:
-			return mm->REGS[reg - 100] >> 8;
+			*val = mm->REGS[reg - 100] >> 8;
 		break;
 		case z_REG_F:
 		case z_REG_C:
@@ -383,10 +383,9 @@ unsigned short z_GetReg(z_Machine* mm, unsigned char reg) {
 		case z_REG_CS:
 		case z_REG_ES:
 		case z_REG_LS:
-			return mm->REGS[reg - 200] & 0xFF;
+			*val = mm->REGS[reg - 200] & 0xFF;
 		break;
 	}
-	return 0;
 }
 unsigned short z_GetParameter(z_Machine* mm, unsigned short num) {
 	unsigned short addr = (mm->REGS[z_REG_SP]) + (num * 2) + 2;

@@ -106,7 +106,7 @@ void z_Run(z_Machine* mm, unsigned short addr); //!show func
 //Use this rather than trying to access registers directly.
 void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val); //!show func
 //Gets the value of a register.
-unsigned short z_GetReg(z_Machine* mm, unsigned char reg); //!show func
+void z_GetReg(z_Machine* mm, unsigned char reg, unsigned short* val); //!show func
 //Read data from memory
 void z_ReadData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen); //!show func
 //Write data to memory

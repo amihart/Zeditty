@@ -76,38 +76,38 @@ static int z_SignExt16(int val);
 static z_InstructionInfo z_InstructionLookup(unsigned char opcode, unsigned char table);
 //Creates a new z_Machine with the
 //default values set.
-void z_InitMachine(z_Machine* mm);
+void z_InitMachine(z_Machine* mm); //!show func
 //Resets a z_Machine to its default values.
-void z_Reset(z_Machine* mm);
+void z_Reset(z_Machine* mm); //!show func
 //If the status of the machine is z_RUNNING and
 //not z_IDLE, then this will execute a single
 //instruction at the current memory address. If it
 //encounters the HALT instruction, then the status
 //will be changed to z_IDLE.
-void z_Step(z_Machine* mm);
+void z_Step(z_Machine* mm); //!show func
 //Sets the status of the machine to z_RUNNING.
-void z_Cont(z_Machine* mm);
+void z_Cont(z_Machine* mm); //!show func
 //Sets the status of the machine to z_IDLE.
-void z_Stop(z_Machine* mm);
+void z_Stop(z_Machine* mm); //!show func
 //Jumps to a memory address (sets PC).
-void z_Jump(z_Machine* mm, unsigned short addr);
+void z_Jump(z_Machine* mm, unsigned short addr); //!show func
 //Begins executing instructions at the current
 //program counter until the HALT instruction is
 //reached. This is a blocking operation.
-void z_Trace(z_Machine* mm);
+void z_Trace(z_Machine* mm); //!show func
 //Jumps to a memory address and begins executing
 //instructions until the HALT instruction is reached.
 //This is a blocking operation.
-void z_Run(z_Machine* mm, unsigned short addr);
+void z_Run(z_Machine* mm, unsigned short addr); //!show func
 //Set the value of a register.
 //Use this rather than trying to access registers directly.
-void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val);
+void z_SetReg(z_Machine* mm, unsigned char reg, unsigned short val); //!show func
 //Gets the value of a register.
-unsigned short z_GetReg(z_Machine* mm, unsigned char reg);
+void z_GetReg(z_Machine* mm, unsigned char reg, unsigned short* val); //!show func
 //Read data from memory
-void z_ReadData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen);
+void z_ReadData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen); //!show func
 //Write data to memory
-void z_WriteData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen);
+void z_WriteData(z_Machine* mm, unsigned short addr, unsigned char* data, int strlen); //!show func
 //used internally
 extern const unsigned char z_OPINFO[45785];
 #endif
