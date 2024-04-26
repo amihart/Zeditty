@@ -1,19 +1,24 @@
 #include <stdio.h>
 #include <zeditty.h>
 
-void z_putchar(z_Machine *mm, unsigned char port, unsigned char value)
+void ports_out(z_Machine *mm, unsigned char port, unsigned char value)
 {
-	if (port == 0x00 && value == 0xFF)
+	switch (port)
 	{
-		z_Stop(mm);
+		case 0x00: putchar(value); break;
+		case 0xFF: z_Stop(mm); break;
+		default:
+			fprintf(stderr, "Invalid port write (%i;%i).\n", port, value);
 	}
-	else if (port == 0x00)
+}
+
+unsigned char ports_in(z_Machine *mm, unsigned char port)
+{
+	switch (port)
 	{
-		putchar(value);
-	}
-	else
-	{
-		fprintf(stderr, "Invalid port write of value 0x%02X to port #%i.\n", port, value);
+		case 0x00: return getchar();
+		default:
+			fprintf(stderr, "Invalid port read (%i).\n", port);
 	}
 }
 
@@ -22,7 +27,8 @@ int main()
 	//Setup our virtual machine
 	z_Machine mm;
 	z_InitMachine(&mm);
-	mm.PortOutCallback = z_putchar;
+	mm.PortOutCallback = ports_out;
+	mm.PortInCallback = ports_in;
 	//Load our program
 	FILE *f = fopen("hello.z80", "r");
 	for (int c, i = 0; (c = fgetc(f)) != EOF; i++)

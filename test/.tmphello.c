@@ -1,5 +1,4 @@
-//Remove this if you're using an
-//older version of SDCC
+
 #define NEW_CALLING_CONVENTION
 void main();
 void __init() __naked
@@ -27,4 +26,11 @@ int putchar(int c)
 	__endasm;
 #endif
 	return c;
+}
+
+#include <stdio.h>
+
+void main()
+{
+	printf("Hello, World!\n");
 }

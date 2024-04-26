@@ -13,7 +13,6 @@ all:
 	$(CC) -c src/zeditty.c -o src/zeditty.o -Iinclude
 	$(AR) rcs lib/libzeditty.a src/zeditty.o src/zeditty_ops.o
 	make -C test/
-	cd test/ && ./interpret
 clean:
-	rm src/*.o
-	rm -rf lib/ test/interpret test/hello.z80
+	rm -f src/*.o
+	make clean -C test/
