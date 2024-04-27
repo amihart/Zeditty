@@ -68,12 +68,6 @@ typedef struct {
 #define z_REG_IXL 205
 #define z_REG_IYH 106
 #define z_REG_IYL 206
-static void z_DefaultPortOutCallback(z_Machine* mm, unsigned char port, unsigned char value);
-static unsigned char z_DefaultPortInCallback(z_Machine* mm, unsigned char port);
-static unsigned short z_DefaultInterruptCallback(z_Machine* mm, unsigned char mode);
-static int z_MemEqu(char* a, char* b, int lena, int lenb);
-static int z_SignExt16(int val);
-static z_InstructionInfo z_InstructionLookup(unsigned char opcode, unsigned char table);
 //Creates a new z_Machine with the
 //default values set.
 void z_InitMachine(z_Machine* mm); //!show func
