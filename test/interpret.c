@@ -49,5 +49,6 @@ int main(int argc, char **argv)
 	fclose(f);
 	//Run the program
 	z_Run(&mm, 0x0000);
+	z_FreeMachine(&mm);
 	return 0;
 }
