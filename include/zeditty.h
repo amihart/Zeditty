@@ -6,7 +6,7 @@ struct z_Machine { //!show struct
 	int T0, T1, ST0, ST1, INT_ENABLED, INT_MODE, TABLE, STATUS;
 	int REGS[14];
 	////!show struct The program memory is located here.
-	unsigned char MEM[65536]; //!show struct
+	unsigned char* MEM; //!show struct
 	////!show struct This callback is executed whenever
 	////!show struct the interpreter encounters an OUT
 	////!show struct instruction.
@@ -77,6 +77,8 @@ static z_InstructionInfo z_InstructionLookup(unsigned char opcode, unsigned char
 //Creates a new z_Machine with the
 //default values set.
 void z_InitMachine(z_Machine* mm); //!show func
+//Frees memory associated with a z_Machine
+void z_FreeMachine(z_Machine* mm); //!show func
 //Resets a z_Machine to its default values.
 void z_Reset(z_Machine* mm); //!show func
 //If the status of the machine is z_RUNNING and

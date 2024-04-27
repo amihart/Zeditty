@@ -57,6 +57,7 @@ static z_InstructionInfo z_InstructionLookup(unsigned char opcode, unsigned char
 	return ii;
 }
 void z_InitMachine(z_Machine* mm) {
+	mm->MEM = malloc(65536);
 	int i;
 	for (i = 0; i < 14; i++) {
 		mm->REGS[i] = 0;
@@ -72,6 +73,9 @@ void z_InitMachine(z_Machine* mm) {
 	mm->PortOutCallback = z_DefaultPortOutCallback;
 	mm->PortInCallback = z_DefaultPortInCallback;
 	mm->InterruptCallback = z_DefaultInterruptCallback;
+}
+void z_FreeMachine(z_Machine* mm) {
+	free(mm->MEM);
 }
 void z_Reset(z_Machine* mm) {
 	int i;

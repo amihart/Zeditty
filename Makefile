@@ -4,11 +4,12 @@ endif
 ifndef AR
 	AR=ar
 endif
+CFLAGS += -std=gnu99
 
 all:
 	mkdir -p lib/
-	$(CC) -c src/zeditty_ops.c -o src/zeditty_ops.o
-	$(CC) -c src/zeditty.c -o src/zeditty.o -Iinclude
+	$(CC) $(CFLAGS) -c src/zeditty_ops.c -o src/zeditty_ops.o
+	$(CC) $(CFLAGS) -c src/zeditty.c -o src/zeditty.o -Iinclude
 	$(AR) rcs lib/libzeditty.a src/zeditty.o src/zeditty_ops.o
 
 clean:
