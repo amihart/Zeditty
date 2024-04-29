@@ -1,5 +1,6 @@
 #ifndef __z_H__
 #define __z_H__
+/* Zilog Z80 interpreter by amihart */
 #include <stdlib.h>
 typedef struct z_Machine z_Machine;
 struct z_Machine { //!show struct
